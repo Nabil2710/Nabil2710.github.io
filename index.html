@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EXOCORTEX Lab | Neuroadaptive Robotics Research</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'lavender': '#d8c9f0',
+                        'sky': '#a7e0f2',
+                        'blush': '#f8c8dc',
+                        'deep-purple': '#6c5ce7',
+                        'soft-cream': '#fdf6f0',
+                    },
+                    fontFamily: {
+                        'sora': ['Sora', 'sans-serif'],
+                        'dmsans': ['DM Sans', 'sans-serif'],
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #fdf6f0, #e6f0ff);
+            font-family: 'DM Sans', sans-serif;
+            color: #2d3748;
+            overflow-x: hidden;
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.05);
+        }
+        
+        .hero-gradient {
+            background: linear-gradient(120deg, #a7e0f2, #d8c9f0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .neu-button {
+            background: linear-gradient(145deg, #ffffff, #e6e6e6);
+            box-shadow: 8px 8px 16px #d1d1d1, 
+                       -8px -8px 16px #ffffff;
+            transition: all 0.3s ease;
+        }
+        
+        .neu-button:hover {
+            box-shadow: 4px 4px 8px #d1d1d1, 
+                       -4px -4px 8px #ffffff;
+            transform: translateY(2px);
+        }
+        
+        .glow-effect {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .glow-effect::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: inherit;
+            background: radial-gradient(circle at center, rgba(108, 92, 231, 0.15) 0%, transparent 70%);
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+        
+        .glow-effect:hover::after {
+            opacity: 1;
+        }
+        
+        .timeline-dot {
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, #a7e0f2, #d8c9f0);
+            border: 4px solid white;
+            box-shadow: 0 0 0 2px #6c5ce7;
+        }
+        
+        .contact-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(247, 247, 255, 0.6));
+        }
+        
+        .floating {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .pulse-icon {
+            animation: pulse-slow 3s infinite;
+        }
+        
+        .brain-wave {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%23a7e0f2' fill-opacity='0.2' d='M0,64L48,80C96,96,192,128,288,128C384,128,480,96,576,90.7C672,85,768,107,864,133.3C960,160,1056,192,1152,181.3C1248,171,1344,117,1392,90.7L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E");
+            background-size: cover;
+            background-position: center;
+            opacity: 0.5;
+            z-index: -1;
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .gradient-bg {
+            background-size: 200% 200%;
+            animation: gradientShift 8s ease infinite;
+        }
+    </style>
+</head>
+<body class="relative overflow-x-hidden">
+    <!-- Animated Background Elements -->
+    <div class="brain-wave"></div>
+    <div class="absolute top-1/4 right-10 w-64 h-64 rounded-full bg-purple-300 opacity-10 blur-3xl"></div>
+    <div class="absolute bottom-1/3 left-10 w-72 h-72 rounded-full bg-blue-300 opacity-10 blur-3xl"></div>
+    
+    <!-- Navigation -->
+    <nav class="fixed w-full py-5 px-6 z-50 backdrop-blur-md bg-white/70">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center">
+                <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-deep-purple to-purple-500 flex items-center justify-center mr-3">
+                    <i class="fas fa-brain text-white text-xl"></i>
+                </div>
+                <span class="text-2xl font-bold bg-gradient-to-r from-deep-purple to-blue-500 bg-clip-text text-transparent">EXOCORTEX</span>
+                <span class="ml-2 text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded-full">LAB</span>
+            </div>
+            
+            <div class="hidden md:flex space-x-8">
+                <a href="#research" class="font-dmsans font-medium text-slate-700 hover:text-deep-purple transition relative group">
+                    Research
+                    <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-deep-purple transition-all duration-300 group-hover:w-full"></span>
+                </a>
+                <a href="#roadmap" class="font-dmsans font-medium text-slate-700 hover:text-deep-purple transition relative group">
+                    Roadmap
+                    <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-deep-purple transition-all duration-300 group-hover:w-full"></span>
+                </a>
+                <a href="#about" class="font-dmsans font-medium text-slate-700 hover:text-deep-purple transition relative group">
+                    About
+                    <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-deep-purple transition-all duration-300 group-hover:w-full"></span>
+                </a>
+                <a href="#contact" class="font-dmsans font-medium text-slate-700 hover:text-deep-purple transition relative group">
+                    Contact
+                    <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-deep-purple transition-all duration-300 group-hover:w-full"></span>
+                </a>
+            </div>
+            
+            <a href="#contact" class="hidden md:block bg-gradient-to-r from-deep-purple to-blue-500 text-white py-2 px-6 rounded-full font-medium hover:shadow-lg transition">
+                Collaborate
+            </a>
+            
+            <button class="md:hidden text-deep-purple">
+                <i class="fas fa-bars text-2xl"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="min-h-screen flex items-center pt-16 relative overflow-hidden">
+        <div class="max-w-7xl mx-auto px-6 py-20 md:py-0 flex flex-col md:flex-row items-center">
+            <div class="md:w-1/2 mb-16 md:mb-0 z-10">
+                <div class="mb-6">
+                    <span class="bg-blue-100 text-blue-800 px-4 py-1.5 rounded-full font-medium">Neuroadaptive Robotics Initiative</span>
+                </div>
+                <h1 class="text-5xl md:text-6xl font-bold leading-tight mb-6 font-sora">
+                    Engineering <span class="hero-gradient">Mind–Machine</span> Synergy
+                </h1>
+                <p class="text-xl text-slate-600 mb-10 max-w-2xl font-dmsans">
+                    I'm Nabil Sajjad. I create brain-controlled robotics that adapt to human emotion — empowering those once left behind.
+                </p>
+                <a href="#research" class="neu-button glow-effect text-deep-purple font-bold py-4 px-8 rounded-full inline-block text-lg transition-all duration-300">
+                    Enter EXOCORTEX Lab
+                </a>
+            </div>
+            
+            <div class="md:w-1/2 flex justify-center z-10">
+                <div class="relative">
+                    <div class="glass-card p-6 rounded-2xl w-full max-w-md">
+                        <div class="relative">
+                            <div class="absolute -inset-4 bg-gradient-to-r from-blue-400 to-purple-500 rounded-2xl blur opacity-20"></div>
+                            <div class="relative bg-gradient-to-br from-sky to-lavender rounded-xl w-full h-64 flex items-center justify-center">
+                                <div class="text-center">
+                                    <div class="floating mb-4">
+                                        <i class="fas fa-brain text-white text-6xl"></i>
+                                    </div>
+                                    <span class="text-white font-bold text-xl">NeuroSync v0.7</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-6 flex items-center">
+                            <div class="bg-gradient-to-br from-deep-purple to-purple-500 w-14 h-14 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-wave-square text-white text-xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <h4 class="font-bold text-lg">Real-time EEG Processing</h4>
+                                <p class="text-slate-600">96% classification accuracy</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="absolute -top-6 -right-6 w-32 h-32 bg-purple-300 rounded-full opacity-20 blur-xl"></div>
+                    <div class="absolute -bottom-6 -left-6 w-24 h-24 bg-blue-300 rounded-full opacity-20 blur-xl"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Animated scroll indicator -->
+        <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 flex flex-col items-center">
+            <span class="text-slate-600 mb-2">Explore Research</span>
+            <div class="w-6 h-10 rounded-full border-2 border-deep-purple flex justify-center p-1">
+                <div class="w-2 h-2 bg-deep-purple rounded-full animate-bounce"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Research Focus -->
+    <section id="research" class="py-20 bg-gradient-to-b from-white/50 to-transparent">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-20">
+                <h2 class="text-4xl font-bold text-center mb-6 font-sora">
+                    <span class="bg-gradient-to-r from-deep-purple to-blue-500 bg-clip-text text-transparent">Research Focus</span>
+                </h2>
+                <p class="text-xl text-slate-600 max-w-3xl mx-auto font-dmsans">
+                    Bridging neuroscience with advanced robotics to create responsive, emotionally-aware systems
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Research Card 1 -->
+                <div class="glass-card p-8 rounded-2xl hover:shadow-xl transition-all duration-300">
+                    <div class="w-16 h-16 rounded-xl bg-purple-100 flex items-center justify-center mb-6">
+                        <i class="fas fa-head-side-brain text-purple-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4 font-sora">Emotion Recognition from EEG</h3>
+                    <p class="text-slate-600 mb-6 font-dmsans">
+                        Developing non-invasive systems that accurately interpret emotional states from brainwave patterns, creating a foundation for adaptive robotics.
+                    </p>
+                    <div class="mt-6">
+                        <span class="inline-block bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm mr-2">ML Algorithms</span>
+                        <span class="inline-block bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">Signal Processing</span>
+                    </div>
+                </div>
+                
+                <!-- Research Card 2 -->
+                <div class="glass-card p-8 rounded-2xl hover:shadow-xl transition-all duration-300">
+                    <div class="w-16 h-16 rounded-xl bg-blue-100 flex items-center justify-center mb-6">
+                        <i class="fas fa-mind-share text-blue-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4 font-sora">Meta-Cognitive Human-Machine Interface</h3>
+                    <p class="text-slate-600 mb-6 font-dmsans">
+                        Creating bidirectional interfaces that not only interpret neural signals but also provide feedback to enhance cognitive performance.
+                    </p>
+                    <div class="mt-6">
+                        <span class="inline-block bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm mr-2">Neural Feedback</span>
+                        <span class="inline-block bg-blush text-pink-800 px-3 py-1 rounded-full text-sm">BCI Design</span>
+                    </div>
+                </div>
+                
+                <!-- Research Card 3 -->
+                <div class="glass-card p-8 rounded-2xl hover:shadow-xl transition-all duration-300">
+                    <div class="w-16 h-16 rounded-xl bg-blush flex items-center justify-center mb-6">
+                        <i class="fas fa-robot text-pink-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4 font-sora">Robotic Limb Soft-Control Algorithms</h3>
+                    <p class="text-slate-600 mb-6 font-dmsans">
+                        Designing intuitive control systems for robotic limbs that respond to subtle neural commands with natural, fluid movements.
+                    </p>
+                    <div class="mt-6">
+                        <span class="inline-block bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm mr-2">Motion Planning</span>
+                        <span class="inline-block bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">Adaptive Control</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Roadmap -->
+    <section id="roadmap" class="py-20 bg-gradient-to-b from-white/30 to-transparent">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-20">
+                <h2 class="text-4xl font-bold text-center mb-6 font-sora">
+                    <span class="bg-gradient-to-r from-blue-500 to-deep-purple bg-clip-text text-transparent">Research Roadmap</span>
+                </h2>
+                <p class="text-xl text-slate-600 max-w-3xl mx-auto font-dmsans">
+                    Strategic milestones for EXOCORTEX Lab's development (2025–2027)
+                </p>
+            </div>
+            
+            <div class="relative max-w-4xl mx-auto">
+                <!-- Vertical Timeline -->
+                <div class="relative pl-10 md:pl-16 border-l-2 border-purple-200">
+                    <!-- Timeline Item 1 -->
+                    <div class="mb-16 relative">
+                        <div class="absolute -left-14 top-0">
+                            <div class="timeline-dot rounded-full"></div>
+                        </div>
+                        <div class="glass-card p-6 rounded-2xl">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-xl font-bold font-sora">2025 Q3 – Research Review</h3>
+                                <span class="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm font-medium">Phase 1</span>
+                            </div>
+                            <p class="text-slate-600 mb-4 font-dmsans">
+                                Comprehensive analysis of existing literature, identification of research gaps, and establishment of experimental protocols.
+                            </p>
+                            <div class="text-sm text-slate-500 italic font-dmsans">
+                                Focus: Literature review, methodology development
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Timeline Item 2 -->
+                    <div class="mb-16 relative">
+                        <div class="absolute -left-14 top-0">
+                            <div class="timeline-dot rounded-full"></div>
+                        </div>
+                        <div class="glass-card p-6 rounded-2xl">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-xl font-bold font-sora">2026 Q1 – Design Frameworks & Signal Mapping</h3>
+                                <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">Phase 2</span>
+                            </div>
+                            <p class="text-slate-600 mb-4 font-dmsans">
+                                Development of neural signal processing pipelines and initial interface prototypes for emotion recognition.
+                            </p>
+                            <div class="text-sm text-slate-500 italic font-dmsans">
+                                Focus: Algorithm design, signal processing
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Timeline Item 3 -->
+                    <div class="mb-16 relative">
+                        <div class="absolute -left-14 top-0">
+                            <div class="timeline-dot rounded-full"></div>
+                        </div>
+                        <div class="glass-card p-6 rounded-2xl">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-xl font-bold font-sora">2026 Q4 – Robotic Prototypes (Simulated + Conceptual)</h3>
+                                <span class="px-3 py-1 bg-blush text-pink-800 rounded-full text-sm font-medium">Phase 3</span>
+                            </div>
+                            <p class="text-slate-600 mb-4 font-dmsans">
+                                Creation of simulated robotic control systems and conceptual designs for emotion-adaptive interfaces.
+                            </p>
+                            <div class="text-sm text-slate-500 italic font-dmsans">
+                                Focus: Simulation, conceptual design
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Timeline Item 4 -->
+                    <div class="relative">
+                        <div class="absolute -left-14 top-0">
+                            <div class="timeline-dot rounded-full"></div>
+                        </div>
+                        <div class="glass-card p-6 rounded-2xl">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-xl font-bold font-sora">2027 Q2 – Open-Source Release + Pre-Startup Push</h3>
+                                <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">Phase 4</span>
+                            </div>
+                            <p class="text-slate-600 mb-4 font-dmsans">
+                                Release of research findings and algorithms as open-source, preparation for startup formation.
+                            </p>
+                            <div class="text-sm text-slate-500 italic font-dmsans">
+                                Focus: Knowledge sharing, community building
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-12 text-center text-slate-600 max-w-2xl mx-auto font-dmsans italic">
+                Note: Current research focuses exclusively on design frameworks, signal processing, and simulated prototypes. Manufacturing of physical systems is not part of the current roadmap.
+            </div>
+        </div>
+    </section>
+
+    <!-- About -->
+    <section id="about" class="py-20">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex flex-col md:flex-row items-center gap-12">
+                <div class="md:w-2/5">
+                    <div class="relative">
+                        <div class="glass-card p-4 rounded-2xl inline-block">
+                            <div class="bg-gradient-to-br from-sky to-lavender rounded-xl w-64 h-64 md:w-80 md:h-80 flex items-center justify-center">
+                                <i class="fas fa-user-astronaut text-white text-7xl"></i>
+                            </div>
+                        </div>
+                        <div class="absolute -bottom-6 -right-6 w-32 h-32 bg-purple-300 rounded-full opacity-20 blur-xl"></div>
+                    </div>
+                </div>
+                
+                <div class="md:w-3/5">
+                    <h2 class="text-4xl font-bold mb-6 font-sora">
+                        <span class="bg-gradient-to-r from-deep-purple to-blue-500 bg-clip-text text-transparent">About the Founder</span>
+                    </h2>
+                    <h3 class="text-2xl font-bold mb-4 font-sora">
+                        Nabil Sajjad: Building the Neurotech Future
+                    </h3>
+                    <p class="text-slate-600 mb-6 font-dmsans">
+                        At 15, Nabil Sajjad is pioneering the next frontier of human-machine interaction. His journey into neurotechnology began with a simple question: "What if technology could understand us as deeply as we understand each other?"
+                    </p>
+                    <p class="text-slate-600 mb-6 font-dmsans">
+                        Driven by a passion for neuroscience and robotics, Nabil founded EXOCORTEX Lab to develop ethical brain-computer interfaces that augment human capabilities without compromising our humanity. His work sits at the intersection of machine learning, affective computing, and neural engineering.
+                    </p>
+                    <div class="glass-card p-6 rounded-2xl mb-6">
+                        <p class="text-slate-700 italic font-dmsans">
+                            <i class="fas fa-quote-left text-deep-purple text-xl mr-2"></i>
+                            We're not just building technology—we're creating a new language for human-machine symbiosis. True innovation in BCI must respect cognitive liberty while expanding what humans can achieve.
+                            <i class="fas fa-quote-right text-deep-purple text-xl ml-2"></i>
+                        </p>
+                    </div>
+                    <h4 class="text-xl font-bold mb-4 font-sora">EXOCORTEX Lab Philosophy</h4>
+                    <p class="text-slate-600 font-dmsans">
+                        <span class="font-bold text-deep-purple">"Brains deserve machines that feel, not just obey."</span> Our approach centers on creating technology that adapts to human emotional states, enhancing agency rather than replacing human decision-making.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact -->
+    <section id="contact" class="py-20 bg-gradient-to-b from-white/50 to-transparent">
+        <div class="max-w-4xl mx-auto px-6">
+            <div class="text-center mb-20">
+                <h2 class="text-4xl font-bold text-center mb-6 font-sora">
+                    <span class="bg-gradient-to-r from-blue-500 to-deep-purple bg-clip-text text-transparent">Connect With Our Research</span>
+                </h2>
+                <p class="text-xl text-slate-600 max-w-3xl mx-auto font-dmsans">
+                    Collaborate, inquire, or learn more about our neuroadaptive research
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-12">
+                <div>
+                    <div class="contact-card glass-card p-8 rounded-2xl">
+                        <h3 class="text-2xl font-bold mb-6 font-sora">Contact Information</h3>
+                        
+                        <div class="space-y-6">
+                            <div class="flex items-start">
+                                <div class="w-12 h-12 rounded-lg bg-purple-100 flex items-center justify-center mr-4">
+                                    <i class="fas fa-envelope text-deep-purple text-xl"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-lg mb-1">Email</h4>
+                                    <a href="mailto:sajjad27@gmail.com" class="text-slate-600 hover:text-deep-purple transition font-dmsans">
+                                        sajjad27@gmail.com
+                                    </a>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start">
+                                <div class="w-12 h-12 rounded-lg bg-blue-100 flex items-center justify-center mr-4">
+                                    <i class="fab fa-github text-deep-purple text-xl"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-lg mb-1">GitHub</h4>
+                                    <a href="https://github.com/Nabil2710" target="_blank" class="text-slate-600 hover:text-deep-purple transition font-dmsans">
+                                        github.com/Nabil2710
+                                    </a>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start">
+                                <div class="w-12 h-12 rounded-lg bg-blush flex items-center justify-center mr-4">
+                                    <i class="fas fa-flask text-deep-purple text-xl"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-lg mb-1">Research Inquiries</h4>
+                                    <p class="text-slate-600 font-dmsans">
+                                        For collaboration opportunities or research partnerships
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <div class="contact-card glass-card p-8 rounded-2xl">
+                        <h3 class="text-2xl font-bold mb-6 font-sora">Send a Message</h3>
+                        <form class="space-y-4">
+                            <div>
+                                <input type="text" placeholder="Your Name" class="w-full p-4 rounded-xl border border-slate-200 focus:ring-2 focus:ring-deep-purple focus:border-transparent outline-none bg-white/50 font-dmsans">
+                            </div>
+                            <div>
+                                <input type="email" placeholder="Your Email" class="w-full p-4 rounded-xl border border-slate-200 focus:ring-2 focus:ring-deep-purple focus:border-transparent outline-none bg-white/50 font-dmsans">
+                            </div>
+                            <div>
+                                <textarea placeholder="Your Message" rows="4" class="w-full p-4 rounded-xl border border-slate-200 focus:ring-2 focus:ring-deep-purple focus:border-transparent outline-none bg-white/50 font-dmsans"></textarea>
+                            </div>
+                            <button type="submit" class="bg-gradient-to-r from-deep-purple to-blue-500 text-white font-bold py-4 px-8 rounded-full w-full hover:shadow-lg transition">
+                                Send Message
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 text-center border-t border-slate-100">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex justify-center mb-6">
+                <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-deep-purple to-purple-500 flex items-center justify-center mr-3">
+                    <i class="fas fa-brain text-white text-xl"></i>
+                </div>
+                <span class="text-2xl font-bold bg-gradient-to-r from-deep-purple to-blue-500 bg-clip-text text-transparent">EXOCORTEX</span>
+                <span class="ml-2 text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded-full self-center">LAB</span>
+            </div>
+            
+            <p class="text-slate-600 max-w-2xl mx-auto mb-8 font-dmsans">
+                Advancing ethical brain-computer interfaces for human augmentation and assistive technology
+            </p>
+            
+            <div class="flex justify-center space-x-6 mb-8">
+                <a href="mailto:sajjad27@gmail.com" class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-deep-purple hover:bg-blue-200 transition">
+                    <i class="fas fa-envelope"></i>
+                </a>
+                <a href="https://github.com/Nabil2710" target="_blank" class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-deep-purple hover:bg-blue-200 transition">
+                    <i class="fab fa-github"></i>
+                </a>
+            </div>
+            
+            <p class="text-sm text-slate-500 font-dmsans">
+                © 2025 EXOCORTEX Lab. Pioneering the future of neurotechnology.
+            </p>
+        </div>
+    </footer>
+
+    <!-- Floating elements for visual interest -->
+    <div class="fixed top-1/4 left-5 w-8 h-8 rounded-full bg-purple-300 opacity-20 blur-xl z-0"></div>
+    <div class="fixed bottom-1/3 right-10 w-10 h-10 rounded-full bg-blue-300 opacity-20 blur-xl z-0"></div>
+    
+    <script>
+        // Simple animation on scroll
+        document.addEventListener('DOMContentLoaded', function() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('animate-fadeIn');
+                    }
+                });
+            }, { threshold: 0.1 });
+            
+            document.querySelectorAll('.glass-card').forEach(card => {
+                observer.observe(card);
+            });
+            
+            // Gradient shift animation for hero button
+            const heroButton = document.querySelector('.neu-button');
+            if(heroButton) {
+                heroButton.addEventListener('mouseenter', function() {
+                    this.style.background = 'linear-gradient(145deg, #f0f0f0, #ffffff)';
+                });
+                
+                heroButton.addEventListener('mouseleave', function() {
+                    this.style.background = 'linear-gradient(145deg, #ffffff, #e6e6e6)';
+                });
+            }
+        });
+    </script>
+</body>
+</html>
